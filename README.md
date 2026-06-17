@@ -136,19 +136,6 @@ GRSS Data Fusion Contest for Houston, and RSIDEA (Wuhan University) for the WHU-
 
 ---
 
-## 🧪 Reference Results
-
-> *Numbers reported in the paper. Reproduce them with the default configuration.*
-
-| Dataset | OA (%) | AA (%) | Kappa (%) |
-|---------|:------:|:------:|:---------:|
-| Indian Pines | — | — | — |
-| Pavia University | — | — | — |
-| Salinas | — | — | — |
-| Houston 2018 | — | — | — |
-
----
-
 ## 👥 Authors
 
 ### Zhenghao Hu
