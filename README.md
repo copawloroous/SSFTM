@@ -176,13 +176,11 @@ Nanjing University of Information Science and Technology, China
 If you find this code useful in your research, please cite our paper:
 
 ```bibtex
-@article{tu2026ssftm,
-  title     = {Spectral State Fusion Tree Mamba for Hyperspectral Image Classification},
-  author    = {Tu, Bing and Hu, Zhenghao and Liu, Bo and He, Yan},
-  journal   = {IEEE Transactions on Image Processing},
-  year      = {2026},
-  pages     = {1--1},
-  doi       = {10.1109/TIP.2026.3700929},
-  publisher = {IEEE}
+@article{tu2026spectral,
+  title={Spectral State Fusion Tree Mamba for Hyperspectral Image Classification},
+  author={Tu, Bing and Hu, Zhenghao and Liu, Bo and He, Yan},
+  journal={IEEE Transactions on Image Processing},
+  year={2026},
+  publisher={IEEE}
 }
 ```
