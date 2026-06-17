@@ -1,0 +1,5 @@
+einops==0.7.0
+matplotlib==3.8.3
+scipy==1.13.0
+timm==0.6.11
+scikit-learn==1.5.2
