@@ -5,7 +5,6 @@
 ### Spectral State Fusion Tree Mamba for Hyperspectral Image Classification
 
 [![Paper](https://img.shields.io/badge/Paper-IEEE%20TIP%202026-blue)](https://doi.org/10.1109/TIP.2026.3700929)
-[![DOI](https://img.shields.io/badge/DOI-10.1109%2FTIP.2026.3700929-orange)](https://doi.org/10.1109/TIP.2026.3700929)
 [![Code](https://img.shields.io/badge/Code-GitHub-black)](https://github.com/copawloroous/SSFTM)
 
 ---
@@ -15,7 +14,7 @@
 [Bo Liu](https://ieeexplore.ieee.org/author/37404906400)<sup>1,2,3,4,5</sup> &nbsp;|&nbsp;
 [Yan He](https://ieeexplore.ieee.org/author/279730212927568)<sup>1,2,3,4,5</sup>
 
-> **Published in:** *IEEE Transactions on Image Processing* (IEEE TIP, Early Access, 2026)
+> **Published in:** *IEEE Transactions on Image Processing* (IEEE TIP 2026), vol. 35, pp. 6385–6400
 
 </div>
 
@@ -40,7 +39,7 @@
 
 ## 📰 News
 
-- **2026-06**: 🎉 Our work **"Spectral State Fusion Tree Mamba for Hyperspectral Image Classification"** has been accepted by **IEEE TIP** (*IEEE Transactions on Image Processing*, 中科院一区 TOP / JCR Q1, CCF-A, IF 13.7)!
+- **2026-06**: 🎉 Our work **"Spectral State Fusion Tree Mamba for Hyperspectral Image Classification"** has been published in **IEEE TIP** (*IEEE Transactions on Image Processing*, 中科院一区 TOP / JCR Q1, CCF-A, IF 13.7)!
 - **2025-03**: 🎉 Our previous work **"Self-Supervised Graph Masked Autoencoders for Hyperspectral Image Classification"** ([SGMAE](https://github.com/copawloroous/SGMAE)) has been accepted by **IEEE TGRS**!
 
 ---
@@ -118,18 +117,23 @@ the predicted maps (`pred_1`, `pred_2`, `gt`) are saved to `./pic` via
 ### Data preparation
 
 Place the `.mat` files under `data/` (or set `export SSFTM_DATA_ROOT=/path/to/data`):
-
-```
 data/
+
 ├── Indian_Pines/    Indian_pines_corrected.mat, Indian_pines_gt.mat
+
 ├── Pavia University/ PaviaU.mat, PaviaU_gt.mat
+
 ├── Salinas/          Salinas_corrected.mat, Salinas_gt.mat
+
 ├── Houston 2013/     HustonU_IM.mat, HustonU_gt.mat
+
 ├── Houston 2018/     houstonU2018.mat
+
 ├── HongHu/           WHU_Hi_HongHu.mat, WHU_Hi_HongHu_gt.mat
+
 ├── HanChuan/         WHU_Hi_HanChuan.mat, WHU_Hi_HanChuan_gt.mat
+
 └── LongKou/          WHU_Hi_LongKou.mat, WHU_Hi_LongKou_gt.mat
-```
 
 The common public sources are GIC (`ehu.eus`) for Indian Pines / Pavia / Salinas, the IEEE
 GRSS Data Fusion Contest for Houston, and RSIDEA (Wuhan University) for the WHU-Hi scenes.
@@ -181,6 +185,9 @@ If you find this code useful in your research, please cite our paper:
   author={Tu, Bing and Hu, Zhenghao and Liu, Bo and He, Yan},
   journal={IEEE Transactions on Image Processing},
   year={2026},
+  volume={35},
+  pages={6385--6400},
+  doi={10.1109/TIP.2026.3700929},
   publisher={IEEE}
 }
 ```
