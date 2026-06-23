@@ -14,7 +14,7 @@
 [Bo Liu](https://ieeexplore.ieee.org/author/37404906400)<sup>1,2,3,4,5</sup> &nbsp;|&nbsp;
 [Yan He](https://ieeexplore.ieee.org/author/279730212927568)<sup>1,2,3,4,5</sup>
 
-> **Published in:** *IEEE Transactions on Image Processing* (IEEE TIP 2026), vol. 35, pp. 6385–6400
+> **Published in:** *IEEE Transactions on Image Processing* (IEEE TIP 2026)
 
 </div>
 
