@@ -161,7 +161,7 @@ Nanjing University of Information Science and Technology, China
   Chinese Academy of Sciences, China
 
 🔬 **Research Interests**  
-Machine Learning · Computer Vision · Pattern Recognition · Hyperspectral Image Processing
+Machine Learning · Computer Vision · Pattern Recognition
 
 🏛️ **Affiliation**
 
