@@ -39,27 +39,8 @@
 
 ## 📰 News
 
-- **2026-06**: 🎉 Our work **"Spectral State Fusion Tree Mamba for Hyperspectral Image Classification"** has been published in **IEEE TIP** (*IEEE Transactions on Image Processing*, 中科院一区 TOP / JCR Q1, CCF-A, IF 13.7)!
-- **2025-03**: 🎉 Our previous work **"Self-Supervised Graph Masked Autoencoders for Hyperspectral Image Classification"** ([SGMAE](https://github.com/copawloroous/SGMAE)) has been accepted by **IEEE TGRS**!
-
----
-
-## 🔍 Overview
-
-Mamba-style state-space models bring linear-complexity long-range modeling to hyperspectral
-image (HSI) classification, but the conventional fixed scan order imposes an arbitrary
-spatial ordering and processes each spectral channel independently. **SSFTM** addresses both
-issues with two components:
-
-- **Tree Scan (TS).** Cosine distances among neighboring pixels and among spectral channels
-  are used to build adaptive minimum spanning trees in **both** the spatial and spectral
-  domains, so the scan path follows feature similarity rather than a fixed raster order.
-- **Spectral State Fusion (SSF).** Multi-layer 1-D dilated convolutions are applied along the
-  spectral dimension of the state-space vectors, enabling inter-channel interaction and
-  multi-scale spectral feature extraction.
-
-Together they establish reasonable spatial–spectral relationships and enable efficient joint
-feature extraction with acceptable computational cost.
+- **2026-06**: 🎉 Our work **"Spectral State Fusion Tree Mamba for Hyperspectral Image Classification"** has been published in **IEEE TIP** (*IEEE Transactions on Image Processing*, 中科院一区 TOP / JCR Q1, CCF-A, IF 15.3)!
+- **2025-03**: 🎉 Our previous work **"Self-Supervised Graph Masked Autoencoders for Hyperspectral Image Classification"** ([SGMAE](https://github.com/copawloroous/SGMAE)) has been accepted by **IEEE TGRS**(*IEEE Transactions on Geoscience and Remote Sensing*, 中科院一区 TOP / JCR Q1, CCF-B, IF 8.6)!
 
 ---
 
@@ -86,92 +67,120 @@ pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 \
 pip install -r requirements.txt
 ```
 
-> **Note on the `_C` extension.** The tree-scanning core is shipped as a precompiled
-> extension (`_C.cpython-39-x86_64-linux-gnu.so`) built for **Python 3.9 / x86_64 Linux**.
-> If your environment differs, rebuild it from the C/CUDA source before running.
+> **Note:** The tree-scanning core (Boruvka MST, BFS, tree-scan refine) ships as a precompiled extension (`_C.cpython-39-x86_64-linux-gnu.so`) built for **Python 3.9 / x86_64 Linux**. Rebuild it from source if your environment differs.
 
 ---
 
-## 🚀 Usage
+## 🚀 Usage Instructions
 
-All settings live in the **Configuration** block at the top of [`main.py`](main.py):
+1. **Dataset Preparation**  
+   The paper uses four benchmarks:
 
-| Option | Meaning |
-|--------|---------|
-| `DATASET_NAME` | `IP / PU / SA / HU13 / HU18 / HH / HC / LK` |
-| `PATCH_SIZE`, `PCA_COMPONENTS` | input patch size and number of PCA bands |
-| `TEST_RATIO` | fraction of labeled samples used for testing |
-| `EPOCHS`, `BATCH_SIZE`, `LEARNING_RATE`, `SEED` | training schedule |
-| `GENERATE_CLS_MAP` | set `True` to save classification maps under `./pic` |
+   | Benchmark | Size | Bands | Classes | Training samples |
+   |:---------:|:----------:|:-----:|:-------:|:----------------:|
+   | **HU13** (Houston 2013) | 349 × 1905 | 144 | 15 | 1 % per class (156) |
+   | **HU18** (Houston 2018) | 601 × 2384 | 50 | 20 | 1 % per class (5,039) |
+   | **HC** (Han Chuan) | 1217 × 303 | 274 | 16 | 20 per class (300) |
+   | **HH** (Hong Hu) | 940 × 475 | 270 | 22 | 20 per class (440) |
 
-Then run:
+   Download the Houston scenes from the IEEE GRSS Data Fusion Contest (2013 / 2018) and the WHU-Hi scenes (HC / HH) from RSIDEA, Wuhan University. Place the `.mat` files under `./data` (or `export SSFTM_DATA_ROOT=/path/to/data`):
 
-```bash
-python main.py
-```
+   ```text
+   data/
+   ├── Houston 2013/  HustonU_IM.mat, HustonU_gt.mat
+   ├── Houston 2018/  houstonU2018.mat
+   ├── HongHu/        WHU_Hi_HongHu.mat, WHU_Hi_HongHu_gt.mat
+   └── HanChuan/      WHU_Hi_HanChuan.mat, WHU_Hi_HanChuan_gt.mat
+   ```
 
-The script prints OA / AA / Kappa and the per-class accuracy. If `GENERATE_CLS_MAP=True`,
-the predicted maps (`pred_1`, `pred_2`, `gt`) are saved to `./pic` via
-[`get_cls_map.py`](get_cls_map.py).
+   `IP / PU / SA / LK` are also supported by the code (see `DATASETS` in [`main.py`](main.py)) but are not used in the paper.
 
-### Data preparation
+2. **Configuration**  
+   All settings live in the **Configuration** block of [`main.py`](main.py). Per-benchmark settings used in the paper:
 
-Place the `.mat` files under `data/` (or set `export SSFTM_DATA_ROOT=/path/to/data`):
-data/
+   | Benchmark | `DATASET_NAME` | `PCA_COMPONENTS` | `PATCH_SIZE` | `TEST_RATIO` |
+   |:---------:|:--------------:|:----------------:|:------------:|:------------:|
+   | Houston 2013 | `"HU13"` | 20 | 5 | 0.99 |
+   | Houston 2018 | `"HU18"` | 20 | 5 | 0.99 |
+   | Han Chuan | `"HC"` | 30 | 9 | ≈ 0.9988 |
+   | Hong Hu | `"HH"` | 30 | 9 | ≈ 0.9989 |
 
-├── Indian_Pines/    Indian_pines_corrected.mat, Indian_pines_gt.mat
+   `TEST_RATIO` is the fraction of labeled samples reserved for testing; the split is stratified per class, so `1 − TEST_RATIO` follows the paper's per-class sampling protocol (e.g., for HC: `1 − (20 × 16) / 257,530`).
 
-├── Pavia University/ PaviaU.mat, PaviaU_gt.mat
+3. **Training & Evaluation**  
+   ```bash
+   python main.py
+   ```
+   Trains with Adam + cross-entropy, then prints **OA / AA / Kappa** and the per-class accuracy over all labeled samples.
 
-├── Salinas/          Salinas_corrected.mat, Salinas_gt.mat
+4. **Classification Maps**  
+   Set `GENERATE_CLS_MAP = True` to save the predicted maps (`pred_1`, `pred_2`, `gt`) under `./pic` via [`get_cls_map.py`](get_cls_map.py).
 
-├── Houston 2013/     HustonU_IM.mat, HustonU_gt.mat
+5. **Hardware Recommendation**  
+   An **NVIDIA RTX 2080 Ti** (11 GB) was used in the paper. If you run into GPU memory errors, try reducing `PCA_COMPONENTS` or `PATCH_SIZE`.
 
-├── Houston 2018/     houstonU2018.mat
+---
 
-├── HongHu/           WHU_Hi_HongHu.mat, WHU_Hi_HongHu_gt.mat
+## 🧪 Reference Experiments
 
-├── HanChuan/         WHU_Hi_HanChuan.mat, WHU_Hi_HanChuan_gt.mat
+> *Results reported in the paper (mean ± std), following the sampling protocols above. SSFTM ranks first in OA / AA / Kappa among all twelve compared CNN / Transformer / Mamba methods.* (Hardware: Intel i9-10900KF · NVIDIA RTX 2080 Ti (11 GB VRAM) · 32 GB RAM.)
 
-└── LongKou/          WHU_Hi_LongKou.mat, WHU_Hi_LongKou_gt.mat
-
-The common public sources are GIC (`ehu.eus`) for Indian Pines / Pavia / Salinas, the IEEE
-GRSS Data Fusion Contest for Houston, and RSIDEA (Wuhan University) for the WHU-Hi scenes.
+| Benchmark | OA (%) | AA (%) | Kappa (%) |
+|:---------:|:---------------:|:---------------:|:----------------:|
+| **HU13** | **88.58 ± 1.86** | **89.19 ± 1.47** | **87.66 ± 2.01** |
+| **HU18** | **89.42 ± 0.10** | **82.69 ± 1.45** | **86.19 ± 0.13** |
+| **HC**   | **88.00 ± 0.95** | **87.06 ± 0.73** | **86.06 ± 1.09** |
+| **HH**   | **90.18 ± 0.97** | **89.67 ± 0.79** | **87.75 ± 1.18** |
 
 ---
 
 ## 👥 Authors
 
-### Zhenghao Hu
+### Prof. Bing Tu — *First Author, Advisor & Corresponding Author*
+
+🎓 Professor and Ph.D. Supervisor  
+*School of Physics and Optoelectronic Engineering*  
+Nanjing University of Information Science and Technology, China
+
+🔗 **Profiles**  
+[![Google Scholar](https://img.shields.io/badge/Google%20Scholar-4285F4?logo=google-scholar&logoColor=white)](https://scholar.google.com/citations?user=iMuSewsAAAAJ&hl=zh-CN&oi=sra)
+[![Faculty Page](https://img.shields.io/badge/Faculty%20Profile-NUIST-1e3a8a)](https://faculty.nuist.edu.cn/tubing/zh_CN/index.htm)
+
+---
+
+### Zhenghao Hu — *Second Author*
 
 🎓 **Education**
 
-- **B.Eng.** in Optoelectronic Information Science and Engineering,
+- **B.Eng.** in Optoelectronic Information Science and Engineering  
+  *School of Physics and Optoelectronic Engineering*  
   Nanjing University of Information Science and Technology, China
-- **Incoming Ph.D. Student** in Pattern Recognition and Intelligent Systems,
-  Institute of Automation, Chinese Academy of Sciences, China
 
-🔬 **Research Interests:** Machine Learning · Computer Vision · Pattern Recognition · Hyperspectral Image Processing
+- **Ph.D. Student** in Pattern Recognition and Intelligent Systems  
+  *Institute of Automation*  
+  Chinese Academy of Sciences, China
 
-📫 **Contact:** [huzhenghao2026@ia.ac.cn](mailto:huzhenghao2026@ia.ac.cn)
+🔬 **Research Interests**  
+Machine Learning · Computer Vision · Pattern Recognition · Hyperspectral Image Processing
+
+🏛️ **Affiliation**
+
+- The Key Laboratory of Cognition and Decision Intelligence for Complex Systems, Institute of Automation, Chinese Academy of Sciences  
+- School of Artificial Intelligence, University of Chinese Academy of Sciences  
+- School of Physics and Optoelectronic Engineering, Nanjing University of Information Science and Technology
+
+📖 **Biography**  
+Zhenghao Hu (Student Member, IEEE) received the B.Sc.Eng. degree in optoelectronic information science and engineering from Nanjing University of Information Science and Technology, Nanjing, China, in 2026. He is currently pursuing the Ph.D. degree in pattern recognition and intelligent systems with the Institute of Automation, Chinese Academy of Sciences, Beijing, China. His research interests include computer vision, machine learning, and pattern recognition.
+
+📫 **Contact**  
+Current: [huzhenghao2026@ia.ac.cn](mailto:huzhenghao2026@ia.ac.cn)  
+Previous: ~~[202213880076@nuist.edu.cn](mailto:202213880076@nuist.edu.cn)~~
 
 🔗 **Profiles**  
 [![Google Scholar](https://img.shields.io/badge/Google%20Scholar-4285F4?logo=google-scholar&logoColor=white)](https://scholar.google.com/citations?user=F5Qx7kAAAAAJ&hl=zh-CN&oi=sra)
 [![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white)](https://github.com/copawloroous)
 [![ORCID](https://img.shields.io/badge/ORCID-A6CE39?logo=orcid&logoColor=white)](https://orcid.org/0009-0004-0285-5763)
 [![IEEE](https://img.shields.io/badge/IEEE-00629B?logo=ieee&logoColor=white)](https://ieeexplore.ieee.org/author/721998129448425)
-
----
-
-### Prof. Bing Tu — *Corresponding Author*
-
-🎓 Professor and Ph.D. Supervisor,
-*School of Physics and Optoelectronic Engineering*,
-Nanjing University of Information Science and Technology, China
-
-🔗 **Profiles**  
-[![Google Scholar](https://img.shields.io/badge/Google%20Scholar-4285F4?logo=google-scholar&logoColor=white)](https://scholar.google.com/citations?user=iMuSewsAAAAJ&hl=zh-CN&oi=sra)
-[![Faculty Page](https://img.shields.io/badge/Faculty%20Profile-NUIST-1e3a8a)](https://faculty.nuist.edu.cn/tubing/zh_CN/index.htm)
 
 ---
 
@@ -185,9 +194,6 @@ If you find this code useful in your research, please cite our paper:
   author={Tu, Bing and Hu, Zhenghao and Liu, Bo and He, Yan},
   journal={IEEE Transactions on Image Processing},
   year={2026},
-  volume={35},
-  pages={6385--6400},
-  doi={10.1109/TIP.2026.3700929},
   publisher={IEEE}
 }
 ```
